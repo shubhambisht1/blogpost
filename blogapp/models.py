@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.urls import reverse
 # Create your models here.
 class Post(models.Model):
     STATUS_CHOICES=(('draft','Draft'),('published','Published'))
@@ -17,3 +18,5 @@ class Post(models.Model):
         ordering=('-publish',)
     def _str__(self):
         return self.title
+    def get_absolute_url(self):
+        return reverse('post_detail',args=[self.publish.year,self.publish.strftime('%m'),self.publish.strftime('%d'),self.slug])
