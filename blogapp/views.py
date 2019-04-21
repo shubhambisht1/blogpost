@@ -19,3 +19,19 @@ def post_detail(request,year,month,day,post):
                                                               publish__month=month,
                                                               publish__day=day)
     return render(request,'blogapp/post_detail.html',{'post':post})
+from django.core.mail import send_mail
+from blogapp.forms import EmailSendForm
+def mail_send_view(request,id):
+    post=get_object_or_404(Post,id=id,status='published')
+    sent=False
+    if request.method=='POST':
+        form=EmailSendForm(request.POST)
+        if form.is_valid():
+            cd=form.cleaned_data
+            subject='{}({}) recommends you to read"{}"'.format(cd['name'],cd['email'],post.title)
+            message='read post at:\n {}\n\n{}\'s comments:\n{}'.format('url',cd['name'],cd['comments'])
+            send_mail(subject,message,'bishtpython@gmail.com',[cd['to']])
+            sent=True
+    else:
+        form=EmailSendForm()
+    return render(request,'blogapp/mail.html',{'form':form,'post':post,'sent':sent})
